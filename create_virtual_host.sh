@@ -13,31 +13,37 @@ else
 		echo "set default extension: $ext"
 	fi
 	cat > /etc/apache2/sites-available/$name.conf << EOF
-	<VirtualHost *:80>
-		    ServerAdmin webmaster@localhost
-		    ServerName $name.$ext
-		    ServerAlias www.$name.$ext
-		    DocumentRoot /var/www/$name.$ext/www
-		    <Directory />
-		            Options FollowSymLinks
-		            AllowOverride None
-		    </Directory>
-		    <Directory /var/www/$name.$ext/www>
-		            Options -Indexes FollowSymLinks MultiViews
-		            AllowOverride All
-		            Order allow,deny
-		            allow from all
-		    </Directory>
+<VirtualHost *:80>
+	ServerAdmin webmaster@localhost
+	ServerName $name.$ext
+	ServerAlias www.$name.$ext
+	DocumentRoot /var/www/$name.$ext/www
+	<Directory />
+		Options FollowSymLinks
+		AllowOverride None
+	</Directory>
+	<Directory /var/www/$name.$ext/www>
+	    	Options Indexes FollowSymLinks MultiViews
+		AllowOverride All
+		Order allow,deny
+		allow from all
+	</Directory>
 
-		    ErrorLog /var/www/$name.$ext/log/error.log
+	ErrorLog /var/www/$name.$ext/log/error.log
 
-		    # Possible values include: debug, info, notice, warn, error, crit,
-		    # alert, emerg.
-		    LogLevel warn
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+	LogLevel warn
 
-		    CustomLog /var/www/$name.$ext/log/access.log combined
-	</VirtualHost>
+	CustomLog /var/www/$name.$ext/log/access.log combined
+</VirtualHost>
 EOF
-	sudo a2ensite $name
-	sudo service apache2 restart ;
+	for i in log www; do sudo mkdir -p /var/www/$name.$ext/$i; done
+	for i in error access; do sudo touch /var/www/$name.$ext/log/$i.log; done
+	sudo touch /var/www/$name.$ext/www/readme.md
+	sudo chown www-data:www-data -R /var/www/$name.$ext
+
+	sudo a2ensite $name.conf
+	sudo service apache2 restart
+	echo "Complete!"
 fi
