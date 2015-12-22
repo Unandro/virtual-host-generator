@@ -1,5 +1,12 @@
 #!/bin/bash
 
+ROOT_UID=0
+
+if [ $UID != $ROOT_UID ]; then
+    echo "Run script as ROOT."
+    exit 1
+fi
+
 echo -n "Name virtual host: "
 read name
 echo -n "Extension virtual host: "
